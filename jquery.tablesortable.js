@@ -1,9 +1,18 @@
-jQuery.fn.tablesortable = function(){
-  var sortedOn  = typeof sortedOn=='undefined'?0:sortedOn;
-  var table     = $(this);
+jQuery.fn.tablesortable = function(o){
+  var def = {nosorter:[9999999]};
+  var conf = $.extend(def,o);
+
+  var sortedOn    = typeof sortedOn=='undefined'?0:sortedOn;
+  var table       = $(this);
 
   table.find('thead th').click(function(){
-    var sortOn    = $(this).index();
+    var number_sort = $(this).hasClass('sort_number');
+    var sortOn      = $(this).index();
+    //verifica se nao esta nas configuracoes para nao efetuar sorter na coluna = [0,1,2,3,4...]
+    if(conf.nosorter.Possui(sortOn)){
+      return false;
+    }
+
     var tbody     = table.find('tbody:first');
     var rows      = tbody.find('tr');
     var rowArray  = new Array();
@@ -17,7 +26,8 @@ jQuery.fn.tablesortable = function(){
       rowArray.reverse();
     }else{
       sortedOn = sortOn;
-      if(sortedOn == 0){
+      if(number_sort){
+      //if(sortedOn == 0){
         rowArray.sort(RowCompareNumbers);
       }else{
         rowArray.sort(RowCompare);
@@ -30,6 +40,13 @@ jQuery.fn.tablesortable = function(){
     }
     tbody.replaceWith(newTbody);
   });
+
+  Array.prototype.Possui=function(v){
+    for (i=0;i<this.length;i++){
+      if (this[i]==v) return true;
+    }
+    return false;
+  }
 
   var RowCompare = function(a, b) {
     var aVal = a.value;
